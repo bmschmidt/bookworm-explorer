@@ -4,21 +4,32 @@ import Bookworm from 'bookworm-vega';
 import Form from "react-jsonschema-form";
 import { get, set } from 'lodash-es';
 
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap/dist/css/bootstrap-theme.css';
+
+
 class App extends Component {
 
-constructor(props) {    
+  constructor(props) {    
     super(props)
-    const bookworm = new Bookworm("#canvas", "http://localhost:10012", window.innerWidth * .66, 400)
-          try {
-             bookworm.query = JSON.parse(decodeURI(window.location.hash.slice(1)))        
-          } catch (e) {
-            bookworm.query = {
-              "database": "federalist_bookworm",
-              "search_limits": [{"word": ["test"]}, {"word": ["search"]}],
-              "aesthetic": {"y": "WordsPerMillion", "x": "date_day", "color": "Search"},
-              "plottype": "linechart"
-            }
-          }
+    let query
+
+    // Attempt to load the query from the URL hash.
+    try {
+      query = JSON.parse(decodeURI(window.location.hash.slice(1)))
+    } catch (e) {
+      query = {
+        "database": "federalist_bookworm",
+        "host": "http://localhost:10012",
+        "search_limits": [{"word": ["test"]}, {"word": ["search"]}],
+        "aesthetic": {"y": "WordsPerMillion", "x": "date_day", "color": "Search"},
+        "plottype": "linechart"
+      }
+    }
+    // Default to this same web site.
+    const host = query.host ? query.host : "/"
+    const bookworm = new Bookworm("#canvas", host, window.innerWidth * 0.75, window.innerHeight * 0.66)
+    bookworm.query = query;
     this.state = { bookworm: bookworm }
   }
 
@@ -137,8 +148,10 @@ class BookwormWords extends Component {
 	if (query.search_limits[i] === undefined) {
 	  query.search_limits[i] = JSON.parse(JSON.stringify(query.search_limits[0]))
 	}
-	query.search_limits[i].word = [word]
+	query.search_limits[i].word = word.split(",").map(d => d.trim())
       })
+      // Drop any queries that were deleted
+      query.search_limits = query.search_limits.slice(0, formData.length)
       window.location.hash = encodeURI(JSON.stringify(query))
       this.props.bookworm.plotAPI(query)
     }
