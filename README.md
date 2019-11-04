@@ -1,3 +1,11 @@
+The Bookworm-Vega repository exposes a JSON-based API for visualizations of language and metadata use.
+
+It does *not* expose any user interface elements. This repository uses React as a framework to do so. My immediate goal
+is just to see how to express some especially common patterns, such as linecharts and heatmaps over time.
+
+Since the Bookworm-Vega library now exposes a JSON schema that defines valid queries for any particular Bookworm, I generally
+am trying to use react-bootstrap-forms as a library to build the interface elements. It's possible but unwieldy to build an entire query using that; instead, I'm generally defining some smaller interface elements, like one that allows you to simply add a few different words and have them appear as different searches.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
